@@ -1,8 +1,11 @@
 /**
- * @brief Sequential Merge Sort in C.
+ * @file merge_sort.c
+ * @author Willy Villalobos (gopwivill@gmail.com)
+ * @brief Sequential implementation of Merge Sort algorithm in C.
+ * @version 0.1.0
+ * @date 2024-09-22
  *
- * @merge_sort.c
- * @author Willy Villalobos
+ * @copyright Copyright (c) 2024
  *
  */
 
@@ -11,10 +14,10 @@
 #include <time.h>
 
 /**
- * @brief Random int list generator.
+ * @brief Random integer list generator.
  *
- * @param buffer
- * @param size
+ * @param buffer Pointer to the first element of the array. Array must be preallocated.
+ * @param size Size of the array.
  */
 void number_list_gen(int *buffer, int size)
 {
@@ -33,7 +36,7 @@ void number_list_gen(int *buffer, int size)
  * @param array
  * @param size
  */
-void print_array(int array[], int size)
+void print_array(int *array, int size)
 {
     for (int i = 0; i < size; i++)
         printf("%d ", array[i]);
@@ -43,12 +46,12 @@ void print_array(int array[], int size)
 /**
  * @brief Merge arrays.
  *
- * @param array
+ * @param array 
  * @param lower_idx
  * @param mid_idx
  * @param higher_idx
  */
-void merge(int array[], int lower_idx, int mid_idx, int higher_idx)
+void merge(int *array, int lower_idx, int mid_idx, int higher_idx)
 {
     // Create temp arrays for merge.
     int n1 = mid_idx - lower_idx + 1;
@@ -103,11 +106,11 @@ void merge(int array[], int lower_idx, int mid_idx, int higher_idx)
 /**
  * @brief Merge sort algorithm. Requires
  *
- * @param array
- * @param lower_idx
- * @param higher_idx
+ * @param array Integer array that is going to be sorted.
+ * @param lower_idx Lowest position of the array that is going to be sorted.
+ * @param higher_idx Highest position of the array that is going to be sorted.
  */
-void merge_sort(int array[], int lower_idx, int higher_idx)
+void merge_sort(int *array, int lower_idx, int higher_idx)
 {
     if (lower_idx < higher_idx)
     {
@@ -120,12 +123,13 @@ void merge_sort(int array[], int lower_idx, int higher_idx)
 
 // Main
 /**
- * @brief
+ * @brief Main program driver. This is where an array is preallocated, filled with random numbers and then sorted.
  *
- * @return int
+ * @return Returns 0 if the program was executed succesfully.
  */
 int main()
 {
+    // Preallocate buffer with any given size.
     int list_to_sort[64] = {0};
     number_list_gen(list_to_sort, 64);
     printf("This is the generated array:\n");
