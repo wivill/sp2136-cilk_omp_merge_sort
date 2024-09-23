@@ -33,8 +33,8 @@ void number_list_gen(int *buffer, int size)
 /**
  * @brief Print input array. Values are separated by space.
  *
- * @param array
- * @param size
+ * @param array Pointer to the array that is going to be printed.
+ * @param size Size of the array to be printed.
  */
 void print_array(int *array, int size)
 {
@@ -46,10 +46,10 @@ void print_array(int *array, int size)
 /**
  * @brief Merge arrays.
  *
- * @param array 
- * @param lower_idx
- * @param mid_idx
- * @param higher_idx
+ * @param array Pointer to the array that is going to be merged.
+ * @param lower_idx Lower index of the array that is going to be merged.
+ * @param mid_idx Middle index of the array that is going to be merged.
+ * @param higher_idx higher index of the array that is going to be merged.
  */
 void merge(int *array, int lower_idx, int mid_idx, int higher_idx)
 {
