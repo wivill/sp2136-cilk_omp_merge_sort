@@ -135,17 +135,17 @@ cmake-build-debug-event-trace/
 
 /src/Makefile
 
-/doc/Makefile
-/doc/translator_report.txt
-/doc/config.doc
-/doc/language.doc
+/docs/Makefile
+/docs/translator_report.txt
+/docs/config.doc
+/docs/language.doc
 
 /doxygen_docs
 /doxygen.tag
 
 /examples/*/html
-/html
-/latex
+docs/html
+docs/latex
 /rtf
 /xml
 /man
