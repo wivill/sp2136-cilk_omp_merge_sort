@@ -1,9 +1,9 @@
 /**
- * @file merge_sort.c
+ * @file omp_merge_sort.c
  * @author Willy Villalobos (gopwivill@gmail.com)
- * @brief Sequential implementation of Merge Sort algorithm in C.
+ * @brief Merge Sort algorithm in C using OpenMP pragmas.
  * @version 0.1.0
- * @date 2024-09-22
+ * @date 2024-09-28
  *
  * @copyright Copyright (c) 2024
  *
@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <omp.h>
 
 /**
  * @brief Random integer list generator.
@@ -25,9 +26,9 @@ void number_list_gen(int *buffer, int size)
     unsigned int seed = 42;
     srand(seed);
 
-    // Fill list buffer with random values between 1 and 100.
+    // Fill list buffer with random values between 1 and 100000.
     for (int i = 0; i < size; i++)
-        buffer[i] = rand() % 100 + 1;
+        buffer[i] = rand() % 100000 + 1;
 }
 
 /**
@@ -115,7 +116,9 @@ void merge_sort(int *array, int lower_idx, int higher_idx)
     if (lower_idx < higher_idx)
     {
         int mid_idx = lower_idx + (higher_idx - lower_idx) / 2;
+#pragma omp task
         merge_sort(array, lower_idx, mid_idx);
+#pragma omp task
         merge_sort(array, mid_idx + 1, higher_idx);
         merge(array, lower_idx, mid_idx, higher_idx);
     }
@@ -125,20 +128,33 @@ void merge_sort(int *array, int lower_idx, int higher_idx)
 /**
  * @brief Main program driver. This is where an array is preallocated, filled with random numbers and then sorted.
  *
- * @return Returns 0 if the program was executed succesfully.
+ * @return Returns 0 if the program was executed successfully.
  */
 int main()
 {
     // Preallocate buffer with any given size.
-    int list_to_sort[64] = {0};
-    number_list_gen(list_to_sort, 64);
-    printf("This is the generated array:\n");
-    print_array(list_to_sort, 64);
+    int list_to_sort[640000] = {0};
+    number_list_gen(list_to_sort, 640000);
+    printf("Skipping array prints.\n");
+    // printf("This is the generated array:\n");
+    // print_array(list_to_sort, 640000);
 
-    merge_sort(list_to_sort, 0, 64 - 1);
+    // Measure time using builtin omp function.
+    double start_time, stop_time;
+    start_time = omp_get_wtime();
 
-    printf("This is the sorted array:\n");
-    print_array(list_to_sort, 64);
+    // Pragma parallel merge sort. This could become its own function.
+#pragma omp parallel
+    {
+#pragma omp single
+        merge_sort(list_to_sort, 0, 640000 - 1);
+    }
+    // Stop timer
+    stop_time = omp_get_wtime();
+
+    // printf("This is the sorted array:\n");
+    // print_array(list_to_sort, 640000);
+    printf("\nParallel runtime: %g\n", stop_time - start_time);
 
     return 0;
 }

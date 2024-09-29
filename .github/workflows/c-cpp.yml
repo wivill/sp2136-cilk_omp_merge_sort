@@ -17,3 +17,7 @@ jobs:
       run: cd sequential && make
     - name: sequential make run
       run: cd sequential && make run
+    - name: OpenMP make
+      run: cd openmp && make
+    - name: OpenMP make run with 2 threads
+      run: cd openmp && make run THREADS=2
