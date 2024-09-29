@@ -13,7 +13,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - name: make
-      run: make
-    - name: make run
-      run: make run
+    - name: sequential make
+      run: cd sequential && make
+    - name: sequential make run
+      run: cd sequential && make run
