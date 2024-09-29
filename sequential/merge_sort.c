@@ -125,7 +125,7 @@ void merge_sort(int *array, int lower_idx, int higher_idx)
 /**
  * @brief Main program driver. This is where an array is preallocated, filled with random numbers and then sorted.
  *
- * @return Returns 0 if the program was executed succesfully.
+ * @return Returns 0 if the program was executed successfully.
  */
 int main()
 {
