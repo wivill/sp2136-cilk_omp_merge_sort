@@ -7,9 +7,10 @@ compile_local: cilk_merge_sort.c
 	clang -fopencilk -Wall cilk_merge_sort.c -o cilk_merge_sort.exe 
 
 compile: cilk_merge_sort.c
-	module load gcc/7.2.0
-	module load mpich/3.2.1-gcc-7.2.0
-	module load cmake/3.17.2
+	# Ensure these modules are loaded:
+	# module load gcc/7.2.0
+	# module load mpich/3.2.1-gcc-7.2.0
+	# module load cmake/3.17.2
 	gcc -fopencilk -Wall cilk_merge_sort.c -o cilk_merge_sort.exe 
 
 submit: 
