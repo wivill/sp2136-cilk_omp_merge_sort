@@ -146,7 +146,7 @@ int main()
     // Pragma parallel merge sort. This could become its own function.
 #pragma omp parallel
     {
-#pragma omp single
+#pragma omp task
         merge_sort(list_to_sort, 0, 64000 - 1);
     }
     // Stop timer
