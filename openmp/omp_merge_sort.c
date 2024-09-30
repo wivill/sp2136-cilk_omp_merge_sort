@@ -133,11 +133,11 @@ void merge_sort(int *array, int lower_idx, int higher_idx)
 int main()
 {
     // Preallocate buffer with any given size.
-    int list_to_sort[640000] = {0};
-    number_list_gen(list_to_sort, 640000);
+    int list_to_sort[64000] = {0};
+    number_list_gen(list_to_sort, 64000);
     printf("Skipping array prints.\n");
     // printf("This is the generated array:\n");
-    // print_array(list_to_sort, 640000);
+    // print_array(list_to_sort, 64000);
 
     // Measure time using builtin omp function.
     double start_time, stop_time;
@@ -147,14 +147,14 @@ int main()
 #pragma omp parallel
     {
 #pragma omp single
-        merge_sort(list_to_sort, 0, 640000 - 1);
+        merge_sort(list_to_sort, 0, 64000 - 1);
     }
     // Stop timer
     stop_time = omp_get_wtime();
 
     // printf("This is the sorted array:\n");
-    // print_array(list_to_sort, 640000);
-    printf("\nParallel runtime: %g\n", stop_time - start_time);
+    // print_array(list_to_sort, 64000);
+    printf("\nParallel runtime (S): %g\n", stop_time - start_time);
 
     return 0;
 }

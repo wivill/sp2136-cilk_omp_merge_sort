@@ -130,15 +130,27 @@ void merge_sort(int *array, int lower_idx, int higher_idx)
 int main()
 {
     // Preallocate buffer with any given size.
-    int list_to_sort[64] = {0};
-    number_list_gen(list_to_sort, 64);
-    printf("This is the generated array:\n");
-    print_array(list_to_sort, 64);
+    int list_to_sort[64000] = {0};
+    number_list_gen(list_to_sort, 64000);
+    printf("Skipping array prints.\n");
+    // printf("This is the generated array:\n");
+    // print_array(list_to_sort, 64000);
 
-    merge_sort(list_to_sort, 0, 64 - 1);
+    // Measure time using time.
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC_RAW, &start);
 
-    printf("This is the sorted array:\n");
-    print_array(list_to_sort, 64);
+    merge_sort(list_to_sort, 0, 64000 - 1);
+
+    // Stop timer
+    clock_gettime(CLOCK_MONOTONIC_RAW, &end);
+
+    // Calculate runtime in micro seconds.
+    double delta_us = (end.tv_sec - start.tv_sec) * 1000000 + (end.tv_nsec - start.tv_nsec) / 1000;
+
+    // printf("This is the sorted array:\n");
+    // print_array(list_to_sort, 64000);
+    printf("\nSequential runtime (uS): %g\n", delta_us);
 
     return 0;
 }

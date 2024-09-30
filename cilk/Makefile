@@ -3,7 +3,7 @@ THREADS?=1
 all: compile
 
 compile: cilk_merge_sort.c
-	clang -Wall cilk_merge_sort.c -o cilk_merge_sort.exe -fopencilk
+	clang -fopencilk -Wall cilk_merge_sort.c -o cilk_merge_sort.exe 
 
 submit: 
 	sbatch ./submit.slurm

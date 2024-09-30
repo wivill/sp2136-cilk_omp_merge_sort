@@ -1,9 +1,9 @@
 /**
- * @file omp_merge_sort.c
+ * @file cilk_merge_sort.c
  * @author Willy Villalobos (gopwivill@gmail.com)
- * @brief Merge Sort algorithm in C using OpenMP pragmas.
+ * @brief Merge Sort algorithm in C using CILK.
  * @version 0.1.0
- * @date 2024-09-28
+ * @date 2024-09-29
  *
  * @copyright Copyright (c) 2024
  *
@@ -12,7 +12,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include <cilk.h>
+#include <cilk/cilk.h>
 
 /**
  * @brief Random integer list generator.
@@ -117,10 +117,14 @@ void merge_sort(int *array, int lower_idx, int higher_idx)
     {
         int mid_idx = lower_idx + (higher_idx - lower_idx) / 2;
         // As per research, variables must be declared outside of cilk_scope.
-
-        merge_sort(array, lower_idx, mid_idx);
-        merge_sort(array, mid_idx + 1, higher_idx);
-        merge(array, lower_idx, mid_idx, higher_idx);
+        cilk_scope
+        {
+            cilk_spawn merge_sort(array, lower_idx, mid_idx);
+            cilk_spawn merge_sort(array, mid_idx + 1, higher_idx);
+            // Sync is required for CILK scope to ensure arrays are updated in time and sorting result is correct. Slight performance impact seeing.
+            cilk_sync;
+            cilk_spawn merge(array, lower_idx, mid_idx, higher_idx);
+        }
     }
 }
 
@@ -132,25 +136,28 @@ void merge_sort(int *array, int lower_idx, int higher_idx)
  */
 int main()
 {
-    // Preallocate buffer with any given size.
-    int list_to_sort[64] = {0};
-    number_list_gen(list_to_sort, 64);
-    // printf("Skipping array prints.\n");
-    printf("This is the generated array:\n");
-    print_array(list_to_sort, 64);
+    // Preallocate buffer with any given size. For some reason using 640000 is giving a segmentation fault only with CILK.
+    int list_to_sort[64000] = {0};
+    number_list_gen(list_to_sort, 64000);
+    printf("Skipping array prints.\n");
+    // printf("This is the generated array:\n");
+    // print_array(list_to_sort, 64000);
 
-    // Measure time using builtin omp function.
-    time_t start_time, stop_time;
-    start_time = time(NULL);
+    // Measure time using time.
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC_RAW, &start);
 
-    merge_sort(list_to_sort, 0, 64 - 1);
+    merge_sort(list_to_sort, 0, 64000 - 1);
 
     // Stop timer
-    stop_time = time(NULL);
+    clock_gettime(CLOCK_MONOTONIC_RAW, &end);
+
+    // Calculate runtime in micro seconds.
+    double delta_us = (end.tv_sec - start.tv_sec) * 1000000 + (end.tv_nsec - start.tv_nsec) / 1000;
 
     printf("This is the sorted array:\n");
-    print_array(list_to_sort, 64);
-    printf("\nParallel runtime: %g\n", stop_time - start_time);
+    print_array(list_to_sort, 64000);
+    printf("\nParallel runtime (uS): %g\n", delta_us);
 
     return 0;
 }
