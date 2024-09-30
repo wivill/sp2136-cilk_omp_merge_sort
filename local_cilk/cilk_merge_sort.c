@@ -155,8 +155,8 @@ int main()
     // Calculate runtime in micro seconds.
     double delta_us = (end.tv_sec - start.tv_sec) * 1000000 + (end.tv_nsec - start.tv_nsec) / 1000;
 
-    printf("This is the sorted array:\n");
-    print_array(list_to_sort, 64000);
+    // printf("This is the sorted array:\n");
+    // print_array(list_to_sort, 64000);
     printf("\nParallel runtime (uS): %g\n", delta_us);
 
     return 0;
