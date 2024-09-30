@@ -2,6 +2,7 @@
 SP2136 Homework 1. This repo contains an implementation of merge sort in C using OpenMP and CILK.
 
 Youtube video: https://youtu.be/0RJuO-MfSBA
+OpenMP results: https://youtu.be/2otbD_4Q3R0
 
 Execution was done locally and in the CeNAT Kabré Cluster.
 
