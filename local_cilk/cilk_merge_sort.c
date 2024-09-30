@@ -117,11 +117,14 @@ void merge_sort(int *array, int lower_idx, int higher_idx)
     {
         int mid_idx = lower_idx + (higher_idx - lower_idx) / 2;
         // As per research, variables must be declared outside of cilk_scope.
-        cilk_spawn merge_sort(array, lower_idx, mid_idx);
-        cilk_spawn merge_sort(array, mid_idx + 1, higher_idx);
-        // Sync is required for CILK scope to ensure arrays are updated in time and sorting result is correct. Slight performance impact seeing.
-        cilk_sync;
-        cilk_spawn merge(array, lower_idx, mid_idx, higher_idx);
+        cilk_scope
+        {
+            cilk_spawn merge_sort(array, lower_idx, mid_idx);
+            cilk_spawn merge_sort(array, mid_idx + 1, higher_idx);
+            // Sync is required for CILK scope to ensure arrays are updated in time and sorting result is correct. Slight performance impact seeing.
+            cilk_sync;
+            cilk_spawn merge(array, lower_idx, mid_idx, higher_idx);
+        }
     }
 }
 
