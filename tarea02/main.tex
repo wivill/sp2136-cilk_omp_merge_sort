@@ -83,7 +83,7 @@
 %
 \lhead{SP2136 - Programación Avanzada}
 \chead{}
-\rhead{Foro \#1}	% Aquí va el numero de experimento, al igual que en el titulo
+\rhead{Tarea \#2}	% Aquí va el numero de experimento, al igual que en el titulo
 \lfoot{Programa de Posgrado en Ingeniería Eléctrica}
 \cfoot{\thepage\ de \pageref{LastPage}}
 \rfoot{Universidad de Costa Rica}
@@ -93,7 +93,7 @@
 \begin{document}
 %
 \title{\LARGE SP2136 - Programación Avanzada:\\
-Proyecto \#1: Parallelization of Image Segmentation Algorithms}
+Tarea \#2: Application Profiling with Score-P and Cube}
 %
 \author{
 \authorblockN{\textsc{Willy Villalobos Marrero}}
@@ -103,101 +103,74 @@ Proyecto \#1: Parallelization of Image Segmentation Algorithms}
 \maketitle
 %
 \begin{abstract}
-El documento seleccionado explica el proceso de segmentación de imágenes en general, y se centra en dos algoritmos en particular, denominados Watershed Transform (transformada de línea divisoria/cuenca), y K-means clustering (Agrupamiento por K-medianas). El artículo explica el razonamiento detrás de la elección de los algoritmos, su funcionamiento y el proceso que se siguió para paralelizarlos y combinarlos.
+Se brinda una introducción al perfilamiento (profiling) de aplicaciones orientadas al HPC, en este caso mediante el ecosistema de herramientas Score-P y Cube.
 \end{abstract}
-\keywords{algo, algo más}
+\keywords{profiling, perfilamiento, score, cube, hpc, high performance computing, ecosystem, ecosistema, parallel, performance, rendimiento, paralelo}
 
-%////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-%////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-%////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+%//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+%//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+%//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 \IEEEpeerreviewmaketitle
 
-\section{Una pequeña introducción al proceso de segmentación de imágenes}
-El artículo se titula \textbf{Parallelization of Image Segmentation Algorithms} \cite{jiangparallelization}, y arranca con la introducción del concepto de segmentación de imágenes como una serie de métodos para reducir y/o filtrar los contenidos de una imagen para su posterior análisis. La forma más típica es la partición de la imagen en regiones con propiedades en común. Algunas aplicaciones de esto son:
+\section{Introducción a las herramientas de rendimiento en paralelo}
+La presentación \cite{profiling_scorep} arranca con una explicación de las estrategias para determinar el rendimiento de una aplicación, ya sea de forma analítica mediante modelos matemáticos o de forma experimental con iteraciones de ejecución o barrido de parámetros por ejemplo. El paso posterior consiste en la medición y el análisis de los resultados para finalmente ser presentado. Según los resultados presentados se puede entrar en un ciclo de optimización donde se mide nuevamente con los cambios incluídos y se determina si estos tuvieron un impacto positivo en el rendimiento, aunque ya esto no necesariamente entra en el enfoque de las herramientas de análisis de rendimiento, sino que es responsabilidad del usuario.
+
+La medición de rendimiento tiene dos dimensiones:
 \begin{itemize}
-\item Imagenología/imágenes médicas.
-\item Visión por computador.
-\item Visión para robótica aplicada.
-\item Reconocimiento facial.
+\item Momento de medición del rendimiento. Puede ser mediante hardware (externo) o por software (interno, síncrono) de instrumentación.
+\item Registro del rendimiento. Se puede realizar mediante \textbf{profile} que consiste en una recolección de datos estadísticos o por \textbf{trace} (rastreo)
 \end{itemize}
 
-Luego se centra en el problema que supone el incremento en la resolución de las imágenes con el paso del tiempo gracias a equipos más modernos. Imágenes de mayor resolución implican un mayor tiempo para procesarlos y más espacio de almacenamiento requerido para guardarlos. Estos retos obligan a buscar formas de procesar las imágenes de forma más rápida, y plantea la paralelización de los algoritmos empleados para segmentar imágenes. Algunos de los algoritmos mencionados en el artículo son:
+En el caso del profile como método de registro de mediciones tenemos la ventaja de la escalabilidad al tratar de registrar los datos de manera agregada, y con diferentes métodos de lograrlo a nivel de código. La facilidad de emplear técnicas estadísticas también facilita en análisis y presentaciónde los datos, aunque con el inconveniente de que se pueden perder de vista variaciones temporales en lo que estamos midiendo. Otro detalle a tener en cuenta es que podemos perder de vista o mover  de lugar potenciales cuellos de botella.
 
-\begin{itemize}
-    \item K-means clustering.
-    \item Histogramas.
-    \item Region growing (Crecimiento de regiones).
-    \item Graph partitioning (Particionamiento de grafos).
-    \item Watershed transform (Transformada de línea divisoria/cuenca).
-    \item Neural networks (Redes neuronales).
-\end{itemize}
+También se habla del caso del trace, en donde es posible reconstruir el comportamiento dinámico de lo que estamos midiendo, y además facilita el profiling a partir de los datos rastrados. El principal inconveniente es la gran cantidad de datos generados en cada iteración, por lo que solo es viable en periodos cortos de ejecución y medición.
+
+Es importante hacer énfasis en que no siempre un único enfoque es suficiente para resolver el problema de medir y analizar los datos. Los requerimientos varían según la aplicación y la necesidad del usuario. Acá podemos considerar mezclar ambos enfoques de medición y almacenamiento de los datos.
+\section{Score-P Ecosystem}
+Consiste en una aplicación orientada a la instrumentación de código abierto y desarrollado por la comunidad, la cual a través de un API combina el profiling y el tracing como métodos de registro de datos de una medición. El reporte de perfilado se exporta mediante un reporte CUBE4 y las trazas mediante OTF2.
+
+En el caso del reporte de profile la presentación de los datos se hace de forma muy interesante mediando un cubo (de ahí el nombre CUBE) dividido en planos. La presentación también explica diferentes herramientas para la presentación y análisis de los datos, y como estos interactúan entre si para facilitar al usuario el proceso de análisis, presentación y optimización, todo parte del ecosistema.
+
+Score-P está orientado a la instrumentación para HPC, por lo que es compatible con diferentes herramientas, bibliotecas y estándares como MPI, OpenMP, CUDA, entre otros. Según el método de paralelización, Score-P ofrece los recursos necesarios para poder construir un reporte de profile de la aplicación a medir.
 
 %////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 %////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 %////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-\section{Algoritmos empleados en el artículo}
-El artículo se centra en la implementación secuencial y paralelizada de los siguientes algoritmos por un tema de uso común y simplicidad de implementación.
 
-\begin{itemize}
-    \item Watershed transform.
-    \item K-means clustering.
-\end{itemize}
 
-Se menciona además trabajos relacionados en donde se paralelizan y ejecutan estos algoritmos en FPGA para acelerar el procesos.
+% \begin{figure}[ht]
+% \centering
+% \includegraphics[width=0.4\textwidth]{watershed_explain.jpg}
+% \caption{Ilustración de algoritmo watershed transform.}
+% \label{fig:watershed_explain}
+% \end{figure}
 
-\subsection{Watershed transform}
-La analogía empleada para explicar el algoritmo consiste en considerar una imagen como si se tratase de un mapa topográfico donde se muestran múltiples valles de distinta altura y profundidad, como si se tratara de cuencos, y en cada cuenco se da una irrigación de agua que tiende a buscar el punto más bajo del valle. Los contornos desde donde se daría esa hipotética irrigación serían los watersheds, el punto más bajo se consideraría la mínima y puede tomarse como el centro del segmento de la imagen. El brillo de cada pixel se puede considerar la altura en dicho mapa. Esta analogía puede apreciarse en la figura \ref{fig:watershed_explain}. Luego de la definición de los contornos y las regiones, se realiza una exportación a imagen binaria en donde los pixeles de los contornos se escriben como 1 (negro) y las regiones o cuencas se escriben como un 0 (blanco).
 
-\begin{figure}[ht]
-\centering
-\includegraphics[width=0.4\textwidth]{watershed_explain.jpg}
-\caption{Ilustración de algoritmo watershed transform.}
-\label{fig:watershed_explain}
-\end{figure}
 
-El artículo hace énfasis en algunas dificultades con el uso del algoritmo, en particular la sobre segmentación de las imágenes, con lo cual se pierde más información, no se clasifica adecuadamente, y se pueden ignorar características más globales. 
-El algoritmo cuenta con varias versiones, y la que se referencia en el artículo es la basada en inmersión de imágenes en escala de grises. La idea es que cada pixel se representa por un valor que oscila entre 0 para un pixel negro, y 255 para un pixel blanco, como se observa en la figura \ref{fig:escala_grises}. Los valores intermedios serían las distintas tonalidades de gris. 
+% \begin{figure}[ht]
+% \centering
+% \includegraphics[width=0.5\textwidth]{escala_grises.png}
+% \caption{Escala de grises empleado en el algoritmo Watershed Transform por inmersión de imágenes.}
+% \label{fig:escala_grises}
+% \end{figure}
 
-\begin{figure}[ht]
-\centering
-\includegraphics[width=0.5\textwidth]{escala_grises.png}
-\caption{Escala de grises empleado en el algoritmo Watershed Transform por inmersión de imágenes.}
-\label{fig:escala_grises}
-\end{figure}
 
-Ya durante la explicación de cómo se paralelizó el algoritmo se detalla qué parte exactamente se decidió paralelizar, la cual corresponde a la parte del recorrido y etiquetado/segmentación de la imagen. Se decidió implementar el algoritmo en Unified Parallel C para ser ejecutado en memoria compartida, y se hizo paralelización a nivel de datos al dividir la imagen de entrada en segmentos a lo ancho. Cada segmento se asigna a uno de los procesadores y procede a realizar la segmentación.
 
-Algunas de las dificultades de la implementación en paralelo tienen que ver principalmente con la definición de límites de vecindad y variables compartidas entre procesos. La final el artículo explica que el algoritmo no escala linealmente y las ganancias no son tan significativas conforme se agregan más núcleos de CPU a la ejecución, como se muestra en la figura \ref{fig:speedup_watershed}. El análisis de la ejecución se realiza con un programa llamado Parallel Performance Wizard (PPF), el cual muestra cuánto porcentaje del tiempo de ejecución se invirtió en cada parte del algoritmo.
+% \begin{figure}[ht]
+% \centering
+% \includegraphics[width=0.5\textwidth]{kmeans_example.png}
+% \caption{Ejemplo de resultado de filtrado por K-means. A la izquierda se tiene una fotografía en escala de grises del Taj Mahal. A la derecha la imagen resultante de segmentaición por K-means.}
+% \label{fig:kmeans_example}
+% \end{figure}
 
-\begin{figure}[ht]
-\centering
-\includegraphics[width=0.5\textwidth]{speedup_watershed.png}
-\caption{Gráficos de speedup del artículo para el algoritmo Watershed Transform en paralelo.}
-\label{fig:speedup_watershed}
-\end{figure}
 
-\subsection{K-means clustering}
-Divide la imagen en K subconjuntos de pixeles, en el cual se usa como criterio las características de pixeles individuales. Cada subconjunto posee un centro cuyo valor es dado por el promedio de los pixeles en el subconjunto. En la ejecución del algoritmo un pixel es agrupado en un conjunto al calcular la distancia entre el pixel y los diferentes centros definidos para cada conjunto, y se asigna al conjunto cuyo centro es el más cercano. El algoritmo realiza varios barridos y en cada uno calcula un criterio de error dado por la suma de los cuadrados de las distancias entre los pixeles en un subconjunto, así como un nuevo centro para cada K subconjunto. El criterio de parada del algoritmo está dado cuando el valor del criterio de error converge a un valor definido. El resultado final se escribe en una nueva imagen, y en la figura \ref{fig:kmeans_example}, en donde se aprecia una recoloración de ciertas áreas de la imagen. El algoritmo básicamente realizó un filtrado de datos de la imagen, como una simplificación. De acuerdo con el artículo citado la idea es eliminar el problema de sobresegmentación del algoritmo Watershed.
+% \begin{figure}[ht]
+% \centering
+% \includegraphics[width=0.5\textwidth]{speedup_kmeans.png}
+% \caption{Gráficos de speedup del artículo para el algoritmo K-means en paralelo.}
+% \label{fig:speedup_kmeans}
+% \end{figure}
 
-\begin{figure}[ht]
-\centering
-\includegraphics[width=0.5\textwidth]{kmeans_example.png}
-\caption{Ejemplo de resultado de filtrado por K-means. A la izquierda se tiene una fotografía en escala de grises del Taj Mahal. A la derecha la imagen resultante de segmentaición por K-means.}
-\label{fig:kmeans_example}
-\end{figure}
-
-El algoritmo K-means fue paralelizado siguiendo un criterio similar al algoritmo Watershed Transform, al dividir la imagen de entrada en segmentos a lo ancho y asignando a cada núcleo dicho segmento. Las partes paralelizadas fueron particularmente las que corresponden al barrido, cálculo de centros y el cálculo del criterio de error. A diferencia del algoritmo Watershed Transform, las ganancias de speedup son más apreciables pues el algoritmo escala de forma más lineal, como se aprecia en la figura \ref{fig:speedup_kmeans}. En ambos escenarios se analiza los porcentajes de tiempo de ejecución para determinar la parte del algoritmo que tiene más sentido acelerar.
-
-\begin{figure}[ht]
-\centering
-\includegraphics[width=0.5\textwidth]{speedup_kmeans.png}
-\caption{Gráficos de speedup del artículo para el algoritmo K-means en paralelo.}
-\label{fig:speedup_kmeans}
-\end{figure}
-
-\section{Combinando ambos algoritmos: K-watershed}
-
-El artículo finalmente consolida los resultados de implementar ambos algoritmos en paralelo en un intento por mejorar tanto el tiempo de ejecución para imágenes de mayor resolución, como por mejorar el resultado final de la segmentación del algoritmo Watershed Transform al eliminar la sobresegmentación. El orden de ejecución sería primero filtrar por K-means para luego segmentar la imagen resultante por watershed. A pesar de las buenas ganancias de paralelizar K-means, globalmente la ganancia se ve truncada por la baja escalabilidad de la parte Watershed, aunque la mejora en el resultado final de segmentación es notable. Quizás se pueda considerar un algoritmo alternativo para realizar la segmentación final que sea más escalable y compatible con el filtrado con K-means.
 
 % \begin{table}[htb!]
 % \centering
