@@ -93,17 +93,17 @@
 \begin{document}
 %
 \title{\LARGE SP2136 - Programación Avanzada:\\
-Tarea \#2: Application Profiling with Score-P and Cube}
+    Tarea \#2: Application Profiling with Score-P and Cube}
 %
 \author{
-\authorblockN{\textsc{Willy Villalobos Marrero}}
-\IEEEauthorblockA{B17170\\Universidad de Costa Rica\\Escuela de Ingeniería Eléctrica \\ \today}
+    \authorblockN{\textsc{Willy Villalobos Marrero}}
+    \IEEEauthorblockA{B17170\\Universidad de Costa Rica\\Escuela de Ingeniería Eléctrica \\ \today}
 }
 % make the title area
 \maketitle
 %
 \begin{abstract}
-Se brinda una introducción al perfilamiento (profiling) de aplicaciones orientadas al HPC, en este caso mediante el ecosistema de herramientas Score-P y Cube.
+    Se brinda una introducción al perfilamiento (profiling) de aplicaciones orientadas al HPC, en este caso mediante el ecosistema de herramientas Score-P y Cube.
 \end{abstract}
 \keywords{profiling, perfilamiento, score, cube, hpc, high performance computing, ecosystem, ecosistema, parallel, performance, rendimiento, paralelo}
 
@@ -117,8 +117,8 @@ La presentación \cite{profiling_scorep} arranca con una explicación de las est
 
 La medición de rendimiento tiene dos dimensiones:
 \begin{itemize}
-\item Momento de medición del rendimiento. Puede ser mediante hardware (externo) o por software (interno, síncrono) de instrumentación.
-\item Registro del rendimiento. Se puede realizar mediante \textbf{profile} que consiste en una recolección de datos estadísticos o por \textbf{trace} (rastreo)
+    \item Momento de medición del rendimiento. Puede ser mediante hardware (externo) o por software (interno, síncrono) de instrumentación.
+    \item Registro del rendimiento. Se puede realizar mediante \textbf{profile} que consiste en una recolección de datos estadísticos o por \textbf{trace} (rastreo)
 \end{itemize}
 
 En el caso del profile como método de registro de mediciones tenemos la ventaja de la escalabilidad al tratar de registrar los datos de manera agregada, y con diferentes métodos de lograrlo a nivel de código. La facilidad de emplear técnicas estadísticas también facilita en análisis y presentaciónde los datos, aunque con el inconveniente de que se pueden perder de vista variaciones temporales en lo que estamos midiendo. Otro detalle a tener en cuenta es que podemos perder de vista o mover  de lugar potenciales cuellos de botella.
@@ -126,12 +126,32 @@ En el caso del profile como método de registro de mediciones tenemos la ventaja
 También se habla del caso del trace, en donde es posible reconstruir el comportamiento dinámico de lo que estamos midiendo, y además facilita el profiling a partir de los datos rastrados. El principal inconveniente es la gran cantidad de datos generados en cada iteración, por lo que solo es viable en periodos cortos de ejecución y medición.
 
 Es importante hacer énfasis en que no siempre un único enfoque es suficiente para resolver el problema de medir y analizar los datos. Los requerimientos varían según la aplicación y la necesidad del usuario. Acá podemos considerar mezclar ambos enfoques de medición y almacenamiento de los datos.
+Algunos métodos para instrumentación de programas en paralelo incluyen el uso de switches a nivel del compilador, instrumentación con API y el uso de bibliotecas especializadas. Se debe tomar en cuenta introducir la menor cantidad de overhead posible.
+
 \section{Score-P Ecosystem}
-Consiste en una aplicación orientada a la instrumentación de código abierto y desarrollado por la comunidad, la cual a través de un API combina el profiling y el tracing como métodos de registro de datos de una medición. El reporte de perfilado se exporta mediante un reporte CUBE4 y las trazas mediante OTF2.
+Consiste en una aplicación orientada a la instrumentación de código abierto y desarrollado por la comunidad, la cual a través de un API combina el profiling y el tracing como métodos de registro de datos de una medición. El reporte de perfilado se exporta mediante un reporte CUBE4 y las trazas mediante OTF2. El ecosistema ofrece a los usuarios la posibilidad de poder seguir el flujo de trabajo del análisis de rendimiento de sus programas al contar con un módulo de instrumentación, diferentes módulos de medición e interfaces para el análisis de estas mediciones, particularmente con el perfilador CUBE4.
 
 En el caso del reporte de profile la presentación de los datos se hace de forma muy interesante mediando un cubo (de ahí el nombre CUBE) dividido en planos. La presentación también explica diferentes herramientas para la presentación y análisis de los datos, y como estos interactúan entre si para facilitar al usuario el proceso de análisis, presentación y optimización, todo parte del ecosistema.
 
 Score-P está orientado a la instrumentación para HPC, por lo que es compatible con diferentes herramientas, bibliotecas y estándares como MPI, OpenMP, CUDA, entre otros. Según el método de paralelización, Score-P ofrece los recursos necesarios para poder construir un reporte de profile de la aplicación a medir.
+
+\section{Mediciones del Método Jacobi/Jacobiano para la resolución de ecuaciones diferenciales.}
+
+El video prosigue con una demostración del perfilamiento de una implementación del método Jacobiano, el cual se compila usando CC=mpicc (C Compiler). En la ejecución inicial con 2 procesos mediante mpiexec se muestra una serie de métricas como la dimensión de la matriz, márgenes de tolerancia y constantes, número de iteraciones y otros valores propios de la ejecución del programa como el residuo, porcentaje de error, tiempo de ejecución y cantidad de operaciones de punto flotante dados en MFlops. Una observación importante que hace el expositor es que la ejecución concurrente de otros programas puede generar ruido y variaciones en las mediciones de rendimiento, de ahí que es importante realizar múltiples iteraciones para obtener una muestra significativa que permita asociar cualquier mejora con las optimizaciones realizadas, y descartar que se deban a que algún proceso concurrente en el sistema terminó de ejecutarse posterior a la etapa de medición.
+
+La siguiente etapa de la demostración se realiza con un cambio en la variable CC="scorep mpicc" para habilitar el ecosistema Score-P y realizar un perfilado del programa. Este cambio por si solo no afecta la ejecución del programa salvo por un ligero incremento en el tiempo de ejecución, de ahí la importancia de tener un ambiente de trabajo limpio, con la menor cantidad posible de aplicaciones concurrentes en ejecución, y además de asegurarse que el análisis de rendimiento tenga el menor impacto posible en el programa. Eecutar un programa compilado con scorep genera un directorio que sigue el formato de nombre scorep-TIMESTAMP, el cual contiene un reporte profile.cubex que se puede extraer desde la línea de comandos. Esto muestra información muy útil de forma organizada por regiones de ejecución, por ejemplo el profiles logra identificar en qué regiones se ejecuta código secuencial, en cuáles se emplean pragmas de OpenMP para paralelizar, en qué puntos de utiliza el paso de mensajes con MPI, entre otros datos. Cada región provee además valores de tiempo y el procentaje del tiempo total de ejecución que cada región representa. Con esos valores básicos es posible identificar potenciales cuellos de botella con solo un pequeño vistazo. También es posible configurar qué mediciones hacer o habilitar y deshabilitar los métodos de almacenamiento de datos.
+
+Posteriormente se hace una demostración del análisis de datos a través de las herramientas de visualización del ecosistema. La organización y visualización de los datos a través de CUBE se puede modelar como un cubo cuyos ejes corresponden a las métricas, ubicación del sistema, y árbol de llamadas al sistema. Esto se representa a través de tres navegadores acoplados y se utilizan colores para facilitar la visualización y el análisis de los datos medidos. La demostración propiamente de la interfaz de CUBE se hace con el perfilado de un benchmark llamado TeaLeaf. La interfaz inicialmente luce similar al GUI de meld para revisar conflictos y diferencias entre archivos y sandboxes de git, con sus pestañas por panel de navegación y el uso de colores para poder identificar cuellos de botella a partir de una métrica, usualmente tiempo de ejecución.
+
+\section{Detalles a rescatar de la presentación}
+\begin{itemize}
+    \item El flujo de trabajo para el análisis de rendimiento de un programa: Instrumentación, medición, análisis, optimización.
+    \item Las diferentes estrategias para la instrumentación: Por hardware o ppor software a través de bibliotecas, funciones internas, herramientas externas, o banderas de compilación
+    \item Las estrategias para almacenar los datos con sus ventajas y desventajas: Profile y Trace.
+    \item Los cuidados de instrumentar y medir con el menor impacto posible sobre el comportamiento y ejecución del programa.
+    \item La variedad de herramientas disponibles para medir y analizar datos para optimizar el programa.
+\end{itemize}
+
 
 %////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 %////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
