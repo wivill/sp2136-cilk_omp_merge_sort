@@ -26,13 +26,13 @@ jobs:
       - uses: actions/checkout@v4
       - uses: xu-cheng/latex-action@v3
         with:
-          root_file: tarea02/main.tex
+          root_file: tarea02/Assignment02.tex
         # This allows the action to pull IEEE class files.
         env:
           TEXINPUTS: ".:./tarea02//:"
       - uses: actions/upload-artifact@v4
         with:
-          name: main
-          path: main.pdf
+          name: Assignment02
+          path: Assignment02.pdf
           if-no-files-found: error
           retention-days: 7
